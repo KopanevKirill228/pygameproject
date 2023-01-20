@@ -367,7 +367,6 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, *group):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
         # Это очень важно!!!
-        # 111
         super().__init__(*group)
         self.image = Bullet.image
         self.rect = self.image.get_rect()

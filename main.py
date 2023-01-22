@@ -12,8 +12,15 @@ screen = pygame.display.set_mode(size)
 pygame.mixer.music.load('муызка_основа.mp3')
 sound1 = pygame.mixer.Sound('взрыв бомбы.mp3')
 a = []
+# создадим группу, содержащую все спрайты
+all_sprites = pygame.sprite.Group()
+all_sprites1 = pygame.sprite.Group()
+all_sprites2 = pygame.sprite.Group()
 all_sprites3 = pygame.sprite.Group()
+all_sprites4 = pygame.sprite.Group()
+all_sprites5 = pygame.sprite.Group()
 level_time = 0
+level = 0
 
 
 class MyWidget(QMainWindow, Ui_MainWindow):
@@ -26,6 +33,7 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         self.pushButton_2.clicked.connect(self.run2)
         self.pushButton_3.clicked.connect(self.run3)
         self.pushButton_4.clicked.connect(self.run4)
+        self.pushButton_5.clicked.connect(self.run5)
 
     def run1(self):
         global level_time
@@ -34,8 +42,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         a = f.readlines()
         level_time = int(a[0])
         self.close()
-#        start_screen()
-
 
     def run2(self):
         global level_time
@@ -44,7 +50,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         a = f.readlines()
         level_time = int(a[0])
         self.close()
-#        start_screen()
 
     def run3(self):
         global level_time
@@ -53,9 +58,6 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         a = f.readlines()
         level_time = int(a[0])
         self.close()
-#        start_screen()
-
-
 
     def run4(self):
         global level_time
@@ -64,10 +66,14 @@ class MyWidget(QMainWindow, Ui_MainWindow):
         a = f.readlines()
         level_time = int(a[0])
         self.close()
-#        start_screen()
+
+    def run5(self):
+        terminate()
 
 
 def load_level(filename):
+    global level
+    level = filename
     # читаем уровень, убирая символы перевода строки
     global a
     try:
@@ -77,24 +83,6 @@ def load_level(filename):
     except:
         print('Cannot load file:', filename)
         raise SystemExit()
-
-
-
-def load_image(name, color_key=None):
-    fullname = os.path.join('data', name)
-    try:
-        image = pygame.image.load(fullname).convert()
-    except pygame.error as message:
-        print('Cannot load image:', name)
-        raise SystemExit(message)
-
-    if color_key is not None:
-        if color_key == -1:
-            color_key = image.get_at((0, 0))
-        image.set_colorkey(color_key)
-    else:
-        image = image.convert_alpha()
-    return image
 
 
 def terminate():
@@ -109,7 +97,6 @@ def start_screen():
                   "ПУШКА СТРЕЛЯЕТ НА ПРОБЕЛ",
                   "ПУЛЯ ЛЕТИТ ИЗ ЦЕНТРА",
                   "ДВИЖЕНИЕ ПУШКИ ПРАВОЙ И ЛЕВОЙ СТРЕЛКАМИ"]
-
     fon = pygame.transform.scale(load_image('фон.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -122,18 +109,12 @@ def start_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
-    app = QApplication(sys.argv)
-    ex = MyWidget()
-    ex.show()
-#    sys.exit(app.exec_())
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                return  # �������� ����
+                return  # ???????? ????
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -141,7 +122,6 @@ def start_screen():
 def stop_screen_win(t):
     intro_text = ["ТЫ ПРОШЕЛ УРОВЕНЬ", "",
                   "ЗА ВРЕМЯ:", str(t)]
-
     fon = pygame.transform.scale(load_image('победа.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -154,7 +134,6 @@ def stop_screen_win(t):
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -166,7 +145,6 @@ def stop_screen_win(t):
 def stop_screen_lose(t):
     intro_text = ["ТЫ НЕ ПРОШЕЛ УРОВЕНЬ", "",
                   "ВРЕМЯ ПРЕВЫСИЛО: " + str(a[0]).strip() + ' СЕКУНД']
-
     fon = pygame.transform.scale(load_image('проигрыш1.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -179,7 +157,6 @@ def stop_screen_lose(t):
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -188,11 +165,9 @@ def stop_screen_lose(t):
         clock.tick(FPS)
 
 
-
 def stop_screen_lose1(t):
     intro_text = ["ТЫ НЕ ПРОШЕЛ УРОВЕНЬ", "",
                   "ТЫ СБИЛ НЕ ВСЕ БОМБЫ"]
-
     fon = pygame.transform.scale(load_image('проигрыш1.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -205,7 +180,6 @@ def stop_screen_lose1(t):
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -215,8 +189,6 @@ def stop_screen_lose1(t):
 
 
 clock = pygame.time.Clock()
-
-#start_screen()
 
 
 def load_image(name, colorkey=None):
@@ -229,7 +201,6 @@ def load_image(name, colorkey=None):
     return image
 
 
-...
 # для отслеживания улетевших частиц
 # удобно использовать пересечение прямоугольников
 screen_rect = (0, 0, width, height)
@@ -257,7 +228,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
     def update(self, atime):
         self.time += 1
-        if (self.time % 50 == 0):
+        if self.time % 50 == 0:
             self.cur_frame = (self.cur_frame - 1) % level_time
             self.image = self.frames[self.cur_frame]
 
@@ -272,12 +243,10 @@ class Particle(pygame.sprite.Sprite):
         super().__init__(asprites)
         self.image = random.choice(self.fire)
         self.rect = self.image.get_rect()
-
         # у каждой частицы своя скорость — это вектор
         self.velocity = [dx, dy]
         # и свои координаты
         self.rect.x, self.rect.y = pos
-
         # гравитация будет одинаковой (значение константы)
         self.gravity = GRAVITY
 
@@ -302,9 +271,34 @@ def create_particles(position, asprites):
         Particle(position, random.choice(numbers), random.choice(numbers), asprites)
 
 
+class Funny(pygame.sprite.Sprite):
+    image = load_image("messi.png")
+
+    def __init__(self, *group):
+        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+        # Это очень важно!!!
+        super().__init__(*group)
+        self.image = Funny.image
+        self.rect = self.image.get_rect()
+        self.rect.x = 800
+        self.rect.y = 800
+
+
+class Funny2(pygame.sprite.Sprite):
+    image = load_image("bomb.png")
+
+    def __init__(self, *group):
+        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+        # Это очень важно!!!
+        super().__init__(*group)
+        self.image = Funny2.image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(104, width - 104)
+        self.rect.y = random.randrange(height - 600)
+
+
 class Gun(pygame.sprite.Sprite):
     image = load_image("images.jpg")
-#    image.set_colorkey((255, 255, 255))
 
     def __init__(self, *group):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
@@ -321,7 +315,6 @@ class Bomb(pygame.sprite.Sprite):
     image = load_image("bomb.png")
     image1 = load_image("boom.png")
     boomed = False
-#    image.set_colorkey((255, 255, 255))
 
     def __init__(self, *group):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
@@ -344,7 +337,6 @@ class Bomb(pygame.sprite.Sprite):
             self.rect = self.rect.move(x, y)
 
 
-
 class Bullet(pygame.sprite.Sprite):
     image = load_image("bullet.png")
     in_action = False
@@ -363,7 +355,6 @@ class Bullet(pygame.sprite.Sprite):
             self.rect.y = arect.y
             self.in_action = True
 
-
     def __init__(self, *group):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
         # Это очень важно!!!
@@ -377,27 +368,24 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.rect.move(x, y)
         if self.rect.y <= 0:
             self.reset_inAction()
-        #if pygame.sprite.spritecollideany(self, bombs):
-            #self.reset_inAction()
-        #if pygame.sprite.spritecollideany(self, vertical_borders):
-            #self.reset_inAction()
 
     def update1(self):
         self.reset_inAction()
 
 
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = MyWidget()
+    ex.show()
     start_screen()
-    if (len(a) != 0):
+    if len(a) != 0:
         pygame.mixer.music.play(-1)
-        # создадим группу, содержащую все спрайты
-        all_sprites = pygame.sprite.Group()
-        all_sprites1 = pygame.sprite.Group()
-        all_sprites2 = pygame.sprite.Group()
         # создадим спрайт
         sprite = Gun(all_sprites)
         bullet = Bullet(all_sprites1)
         number = AnimatedSprite(load_image("цифры.png"), 10, 10, 0, 0)
+        funny = 0
+        funny2 = 0
         running = True
         x_pos = 0
         x = 0
@@ -414,11 +402,16 @@ if __name__ == '__main__':
         y_pos1 = -15
         t = 0
         b = False
+        time_sparkles = 0
         while running:
             all_sprites3.update(clock.tick())
             if not b and t > int(a[0]):
                 running = False
                 stop_screen_lose(t)
+            if b:
+                if t - time_sparkles > 10:
+                    running = False
+                    stop_screen_win(t)
             screen.fill((255, 255, 255))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -436,6 +429,10 @@ if __name__ == '__main__':
                         motion = 2
                     elif event.key == pygame.K_SPACE:
                         bullet.set_inAction(sprite.rect, sprite.image.get_width())
+                    elif event.key == pygame.K_0:
+                        funny = Funny(all_sprites4)
+                    elif event.key == pygame.K_b:
+                        funny2 = Funny2(all_sprites5)
                 elif event.type == pygame.KEYUP:
                     if event.key in [pygame.K_LEFT,
                                  pygame.K_RIGHT]:
@@ -465,6 +462,8 @@ if __name__ == '__main__':
                     ch += 1
             if ch == len(bombs):
                 create_particles((sprite.rect.x + sprite.image.get_width() // 2, 0), all_sprites2)
+                if time_sparkles == 0:
+                    time_sparkles = t
                 b = True
             if a[2] == 'True':
                 for i in range(len(bombs)):
@@ -478,6 +477,8 @@ if __name__ == '__main__':
             all_sprites1.draw(screen)
             all_sprites2.draw(screen)
             all_sprites3.draw(screen)
+            all_sprites4.draw(screen)
+            all_sprites5.draw(screen)
             pygame.display.flip()
             t += clock.tick() / FPS
             clock.tick(200)

@@ -2,23 +2,26 @@ import pygame
 import os
 import sys
 import random
+import datetime
+
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow
 from ui_file import Ui_MainWindow
 size = width, height = 1000, 1000
+music = ['музыка_основа2.mp3', 'муызка_основа.mp3', 'музыка_основа3.mp3']
 GRAVITY = 2
 FPS = 50
 pygame.init()
 screen = pygame.display.set_mode(size)
-pygame.mixer.music.load('муызка_основа.mp3')
+pygame.mixer.music.load(random.choice(music))
 sound1 = pygame.mixer.Sound('взрыв бомбы.mp3')
 a = []
 # создадим группу, содержащую все спрайты
 all_sprites = pygame.sprite.Group()
-all_sprites1 = pygame.sprite.Group()
-all_sprites2 = pygame.sprite.Group()
-all_sprites3 = pygame.sprite.Group()
-all_sprites4 = pygame.sprite.Group()
-all_sprites5 = pygame.sprite.Group()
+all_sprites_bullet = pygame.sprite.Group()
+all_sprites_stars = pygame.sprite.Group()
+all_sprites_time = pygame.sprite.Group()
+all_sprites_messi = pygame.sprite.Group()
+all_sprites_bomb_fake = pygame.sprite.Group()
 level_time = 0
 level = 0
 
@@ -208,8 +211,8 @@ screen_rect = (0, 0, width, height)
 
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x3, y):
-        global all_sprites3
-        super().__init__(all_sprites3)
+        global all_sprites_time
+        super().__init__(all_sprites_time)
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = level_time - 1
@@ -381,8 +384,8 @@ if __name__ == '__main__':
     if len(a) != 0:
         pygame.mixer.music.play(-1)
         # создадим спрайт
-        sprite = Gun(all_sprites)
-        bullet = Bullet(all_sprites1)
+        gun = Gun(all_sprites)
+        bullet = Bullet(all_sprites_bullet)
         number = AnimatedSprite(load_image("цифры.png"), 10, 10, 0, 0)
         funny = 0
         funny2 = 0
@@ -395,32 +398,40 @@ if __name__ == '__main__':
         for i in range(int(a[1])):
             bombs.append(Bomb(all_sprites))
         motion = 0
-        y_pos = height - sprite.image.get_height()
+        y_pos = height - gun.image.get_height()
         all_sprites.update(x_pos, y_pos)
         y_pos = 0
         x_pos1 = 0
         y_pos1 = -15
         t = 0
+        time_begin = datetime.datetime.now()
+        time_end = datetime.datetime.now()
         b = False
         time_sparkles = 0
         while running:
-            all_sprites3.update(clock.tick())
+            all_sprites_time.update(clock.tick())
             if not b and t > int(a[0]):
                 running = False
-                stop_screen_lose(t)
+                time_end = datetime.datetime.now()
+                delta = time_end - time_begin
+                stop_screen_lose(delta)
             if b:
                 if t - time_sparkles > 10:
                     running = False
-                    stop_screen_win(t)
+                    delta = time_end - time_begin
+                    stop_screen_win(delta)
             screen.fill((255, 255, 255))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     if ch == len(bombs):
-                        stop_screen_win(t)
+                        delta = time_end - time_begin
+                        stop_screen_win(delta)
                         running = False
                     else:
-                        stop_screen_lose1(t)
+                        time_end = datetime.datetime.now()
+                        delta = time_end - time_begin
+                        stop_screen_lose1(delta)
                         running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
@@ -428,11 +439,11 @@ if __name__ == '__main__':
                     elif event.key == pygame.K_RIGHT:
                         motion = 2
                     elif event.key == pygame.K_SPACE:
-                        bullet.set_inAction(sprite.rect, sprite.image.get_width())
+                        bullet.set_inAction(gun.rect, gun.image.get_width())
                     elif event.key == pygame.K_0:
-                        funny = Funny(all_sprites4)
+                        funny = Funny(all_sprites_messi)
                     elif event.key == pygame.K_b:
-                        funny2 = Funny2(all_sprites5)
+                        funny2 = Funny2(all_sprites_bomb_fake)
                 elif event.type == pygame.KEYUP:
                     if event.key in [pygame.K_LEFT,
                                  pygame.K_RIGHT]:
@@ -442,14 +453,14 @@ if __name__ == '__main__':
                 x_pos = -5
             elif motion == 2:
                 x_pos = 5
-            if x <= (width - sprite.image.get_width()) and motion == 2:
+            if x <= (width - gun.image.get_width()) and motion == 2:
                 x += x_pos
                 all_sprites.update(x_pos, y_pos)
             if x >= 0 and motion == 1:
                 x += x_pos
                 all_sprites.update(x_pos, y_pos)
             if bullet.get_inAction():
-                all_sprites1.update(x_pos1, y_pos1)
+                all_sprites_bullet.update(x_pos1, y_pos1)
             for i in range(len(bombs)):
                 if bombs[i].get_boomed():
                     continue
@@ -461,9 +472,10 @@ if __name__ == '__main__':
                     sound1.play()
                     ch += 1
             if ch == len(bombs):
-                create_particles((sprite.rect.x + sprite.image.get_width() // 2, 0), all_sprites2)
+                create_particles((gun.rect.x + gun.image.get_width() // 2, 0), all_sprites_stars)
                 if time_sparkles == 0:
                     time_sparkles = t
+                time_end = datetime.datetime.now()
                 b = True
             if a[2] == 'True':
                 for i in range(len(bombs)):
@@ -472,13 +484,13 @@ if __name__ == '__main__':
                         v = -v
                     bombs[i].update2(v, y_pos)
                     clock.tick()
-            all_sprites2.update()
+            all_sprites_stars.update()
             all_sprites.draw(screen)
-            all_sprites1.draw(screen)
-            all_sprites2.draw(screen)
-            all_sprites3.draw(screen)
-            all_sprites4.draw(screen)
-            all_sprites5.draw(screen)
+            all_sprites_bullet.draw(screen)
+            all_sprites_stars.draw(screen)
+            all_sprites_time.draw(screen)
+            all_sprites_messi.draw(screen)
+            all_sprites_bomb_fake.draw(screen)
             pygame.display.flip()
             t += clock.tick() / FPS
             clock.tick(200)

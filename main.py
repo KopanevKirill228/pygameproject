@@ -123,6 +123,8 @@ def start_screen():
 
 
 def stop_screen_win(t):
+    delta_time = datetime.timedelta(seconds=-4)
+    t += delta_time
     intro_text = ["ТЫ ПРОШЕЛ УРОВЕНЬ", "",
                   "ЗА ВРЕМЯ:", str(t)]
     fon = pygame.transform.scale(load_image('победа.jpg'), (width, height))
